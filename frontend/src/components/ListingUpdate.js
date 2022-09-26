@@ -10,7 +10,7 @@ import {
     Typography,
     Button,
     Checkbox,
-    MenuItem,
+    Snackbar,
     CardMedia,
     CardContent,
     CircularProgress,
@@ -122,6 +122,8 @@ function ListingUpdate(props) {
         cctvValue: props.listingData.cctv,
         parkingValue: props.listingData.parking,
         sendRequest: 0,
+        openSnack: false,
+        disabledBtn: false,
     };
 
     function ReducerFunction(draft, action) {
@@ -137,7 +139,6 @@ function ListingUpdate(props) {
             case "catchDescriptionChange":
                 draft.descriptionValue = action.descriptionChosen;
                 break;
-
 
             case "catchPropertyStatusChange":
                 draft.propertyStatusValue = action.propertyStatusChosen;
@@ -178,6 +179,18 @@ function ListingUpdate(props) {
             case "changeSendRequest":
                 draft.sendRequest = draft.sendRequest + 1;
                 break;
+
+            case "openTheSnack":
+                draft.openSnack = true;
+                break;
+
+            case "disabledTheBtn":
+                draft.disabledBtn = true;
+                break;
+
+            case "enabledTheBtn":
+                draft.disabledBtn = false;
+                break;
         }
     }
 
@@ -187,25 +200,54 @@ function ListingUpdate(props) {
         e.preventDefault();
         console.log("the form has been submitted");
         dispatch({ type: "changeSendRequest" });
+        dispatch({ type: "disabledTheBtn" });
     }
 
     useEffect(() => {
         if (state.sendRequest) {
             async function UpdateProperty() {
                 const formData = new FormData();
-                formData.append("title", state.titleValue);
-                formData.append("description", state.descriptionValue);
-                formData.append("listing_type", state.listingTypeValue);
-                formData.append("property_status", state.propertyStatusValue);
-                formData.append("price", state.priceValue);
-                formData.append("rental_frequency", state.rentalFrequencyValue);
-                formData.append("rooms", state.roomsValue);
-                formData.append("furnished", state.furnishedValue);
-                formData.append("pool", state.poolValue);
-                formData.append("elevator", state.elevatorValue);
-                formData.append("cctv", state.cctvValue);
-                formData.append("parking", state.parkingValue);
-                formData.append("seller", GlobalState.userId);
+                if (state.listingTypeValue === "Office") {
+                    formData.append("title", state.titleValue);
+                    formData.append("description", state.descriptionValue);
+                    formData.append("listing_type", state.listingTypeValue);
+                    formData.append(
+                        "property_status",
+                        state.propertyStatusValue
+                    );
+                    formData.append("price", 0);
+                    formData.append(
+                        "rental_frequency",
+                        state.rentalFrequencyValue
+                    );
+                    formData.append("rooms", state.roomsValue);
+                    formData.append("furnished", state.furnishedValue);
+                    formData.append("pool", state.poolValue);
+                    formData.append("elevator", state.elevatorValue);
+                    formData.append("cctv", state.cctvValue);
+                    formData.append("parking", state.parkingValue);
+                    formData.append("seller", GlobalState.userId);
+                } else {
+                    formData.append("title", state.titleValue);
+                    formData.append("description", state.descriptionValue);
+                    formData.append("listing_type", state.listingTypeValue);
+                    formData.append(
+                        "property_status",
+                        state.propertyStatusValue
+                    );
+                    formData.append("price", state.priceValue);
+                    formData.append(
+                        "rental_frequency",
+                        state.rentalFrequencyValue
+                    );
+                    formData.append("rooms", state.roomsValue);
+                    formData.append("furnished", state.furnishedValue);
+                    formData.append("pool", state.poolValue);
+                    formData.append("elevator", state.elevatorValue);
+                    formData.append("cctv", state.cctvValue);
+                    formData.append("parking", state.parkingValue);
+                    formData.append("seller", GlobalState.userId);
+                }
 
                 try {
                     const response = await axios.patch(
@@ -213,14 +255,24 @@ function ListingUpdate(props) {
                         formData
                     );
                     console.log(response.data);
-                    navigate(0);
+                    dispatch({ type: "openTheSnack" });
                 } catch (e) {
                     console.log(e.response);
+                    dispatch({ type: "enabledTheBtn" });
                 }
             }
             UpdateProperty();
         }
     }, [state.sendRequest]);
+
+    // SnackBar timeout then allowing the redirect
+    useEffect(() => {
+        if (state.openSnack) {
+            setTimeout(() => {
+                navigate(0);
+            }, 1500);
+        }
+    }, [state.openSnack]);
 
     function PriceDisplay() {
         if (
@@ -504,16 +556,27 @@ function ListingUpdate(props) {
                     }}
                 >
                     <Button
-                    variant="contained"
-                    fullWidth
-                    type="submit"
-                    className={classes.registerBtn}
-                >
-                    UPDATE
-                </Button>
+                        variant="contained"
+                        fullWidth
+                        type="submit"
+                        className={classes.registerBtn}
+                        disabled={state.disabledBtn}
+                    >
+                        UPDATE
+                    </Button>
                 </Grid>
             </form>
-            <Button variant="contained" onClick={props.closeDialog}>CANCEL</Button>
+            <Button variant="contained" onClick={props.closeDialog}>
+                CANCEL
+            </Button>
+            <Snackbar
+                open={state.openSnack}
+                message="You have successfully updated the listing!"
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center",
+                }}
+            />
         </div>
     );
 }

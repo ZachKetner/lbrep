@@ -26,7 +26,7 @@ import {
     Typography,
     Button,
     Dialog,
-    CardActions,
+    Snackbar,
     CardMedia,
     CardContent,
     CircularProgress,
@@ -96,6 +96,8 @@ function ListingDetail() {
         dataIsLoading: true,
         listingInfo: "",
         sellerProfileInfo: "",
+        openSnack: false,
+        disabledBtn: false,
     };
 
     function ReducerFunction(draft, action) {
@@ -110,6 +112,18 @@ function ListingDetail() {
 
             case "catchSellerProfileInfo":
                 draft.sellerProfileInfo = action.profileObject;
+                break;
+
+            case "openTheSnack":
+                draft.openSnack = true;
+                break;
+
+            case "disabledTheBtn":
+                draft.disabledBtn = true;
+                break;
+
+            case "enabledTheBtn":
+                draft.disabledBtn = false;
                 break;
         }
     }
@@ -203,12 +217,23 @@ function ListingDetail() {
                     `http://localhost:8000/api/listings/${params.id}/delete/`
                 );
                 console.log(response.data);
-                navigate("/listings");
+                dispatch({ type: "openTheSnack" });
+                dispatch({ type: "disabledTheBtn" });
             } catch (e) {
                 console.log(e.response.data);
+                dispatch({ type: "enabledTheBtn" });
             }
         }
     }
+
+    // SnackBar timeout then allowing the redirect
+    useEffect(() => {
+        if (state.openSnack) {
+            setTimeout(() => {
+                navigate("/listings");
+            }, 1500);
+        }
+    }, [state.openSnack]);
 
     // Form Dialog requirements
 
@@ -522,18 +547,26 @@ function ListingDetail() {
                         justifyContent="space-around"
                         style={{ marginTop: "0.5rem" }}
                     >
-                        <Button variant="contained" color="primary" onClick={handleClickOpen}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleClickOpen}
+                        >
                             Update
                         </Button>
                         <Button
                             variant="contained"
                             color="error"
                             onClick={DeleteHandler}
+                            disabled={state.disabledBtn}
                         >
                             Delete
                         </Button>
-                        <Dialog open={open} onClose={handleClose} fullScreen >
-                            <ListingUpdate listingData ={state.listingInfo} closeDialog={handleClose} />
+                        <Dialog open={open} onClose={handleClose} fullScreen>
+                            <ListingUpdate
+                                listingData={state.listingInfo}
+                                closeDialog={handleClose}
+                            />
                         </Dialog>
                     </Grid>
                 ) : (
@@ -667,6 +700,14 @@ function ListingDetail() {
                     </MapContainer>
                 </Grid>
             </Grid>
+            <Snackbar
+                open={state.openSnack}
+                message="You have successfully deleted the property!"
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center",
+                }}
+            />
         </div>
     );
 }

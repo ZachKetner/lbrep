@@ -10,11 +10,12 @@ import {
     Typography,
     Button,
     Checkbox,
-    MenuItem,
+    Snackbar,
     CardMedia,
     CardContent,
     CircularProgress,
     TextField,
+    Alert,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 
@@ -340,16 +341,46 @@ function AddProperty() {
             agencyName: "",
             phoneNumber: "",
         },
+        openSnack: false,
+        disabledBtn: false,
+        titleErrors: {
+            hasErrors: false,
+            errorMessage: "",
+        },
+        listingTypeErrors: {
+            hasErrors: false,
+            errorMessage: "",
+        },
+        propertyStatusErrors: {
+            hasErrors: false,
+            errorMessage: "",
+        },
+        priceErrors: {
+            hasErrors: false,
+            errorMessage: "",
+        },
+        areaErrors: {
+            hasErrors: false,
+            errorMessage: "",
+        },
+        boroughErrors: {
+            hasErrors: false,
+            errorMessage: "",
+        },
     };
 
     function ReducerFunction(draft, action) {
         switch (action.type) {
             case "catchTitleChange":
                 draft.titleValue = action.titleChosen;
+                draft.titleErrors.hasErrors = false;
+                draft.titleErrors.errorMessage = "";
                 break;
 
             case "catchListingTypeChange":
                 draft.listingTypeValue = action.listingTypeChosen;
+                draft.listingTypeErrors.hasErrors = false;
+                draft.listingTypeErrors.errorMessage = "";
                 break;
 
             case "catchDescriptionChange":
@@ -358,10 +389,14 @@ function AddProperty() {
 
             case "catchAreaChange":
                 draft.areaValue = action.areaChosen;
+                draft.areaErrors.hasErrors = false;
+                draft.areaErrors.errorMessage = "";
                 break;
 
             case "catchBoroughChange":
                 draft.boroughValue = action.boroughChosen;
+                draft.boroughErrors.hasErrors = false;
+                draft.boroughErrors.errorMessage = "";
                 break;
 
             case "catchLatitudeChange":
@@ -374,10 +409,14 @@ function AddProperty() {
 
             case "catchPropertyStatusChange":
                 draft.propertyStatusValue = action.propertyStatusChosen;
+                draft.propertyStatusErrors.hasErrors = false;
+                draft.propertyStatusErrors.errorMessage = "";
                 break;
 
             case "catchPriceChange":
                 draft.priceValue = action.priceChosen;
+                draft.priceErrors.hasErrors = false;
+                draft.priceErrors.errorMessage = "";
                 break;
 
             case "catchRentalFrequencyChange":
@@ -446,10 +485,101 @@ function AddProperty() {
             case "changeSendRequest":
                 draft.sendRequest = draft.sendRequest + 1;
                 break;
+
             case "catchUserProfileInfo":
                 draft.userProfile.agencyName = action.profileObject.agency_name;
                 draft.userProfile.phoneNumber =
                     action.profileObject.phone_number;
+                break;
+
+            case "openTheSnack":
+                draft.openSnack = true;
+                break;
+
+            case "disabledTheBtn":
+                draft.disabledBtn = true;
+                break;
+
+            case "enabledTheBtn":
+                draft.disabledBtn = false;
+                break;
+
+            case "catchTitleErrors":
+                if (action.titleChosen.length === 0) {
+                    draft.titleErrors.hasErrors = true;
+                    draft.titleErrors.errorMessage =
+                        "This field must not be blank!";
+                }
+                break;
+
+            case "catchListingTypeErrors":
+                if (action.listingTypeChosen.length === 0) {
+                    draft.listingTypeErrors.hasErrors = true;
+                    draft.listingTypeErrors.errorMessage =
+                        "This field must not be blank!";
+                }
+                break;
+
+            case "catchPropertyStatusErrors":
+                if (action.propertyStatusChosen.length === 0) {
+                    draft.propertyStatusErrors.hasErrors = true;
+                    draft.propertyStatusErrors.errorMessage =
+                        "This field must not be blank!";
+                }
+                break;
+
+            case "catchPriceErrors":
+                if (action.priceChosen.length === 0) {
+                    draft.priceErrors.hasErrors = true;
+                    draft.priceErrors.errorMessage =
+                        "This field must not be blank!";
+                }
+                break;
+
+            case "catchAreaErrors":
+                if (action.areaChosen.length === 0) {
+                    draft.areaErrors.hasErrors = true;
+                    draft.areaErrors.errorMessage =
+                        "This field must not be blank!";
+                }
+                break;
+
+            case "catchBoroughErrors":
+                if (action.boroughChosen.length === 0) {
+                    draft.boroughErrors.hasErrors = true;
+                    draft.boroughErrors.errorMessage =
+                        "This field must not be blank!";
+                }
+                break;
+
+            case "emptyTitle":
+                draft.titleErrors.hasErrors = true;
+                draft.titleErrors.errorMessage = "This field must not be blank!"
+                break;
+
+            case "emptyListingType":
+                draft.listingTypeErrors.hasErrors = true;
+                draft.listingTypeErrors.errorMessage = "This field must not be blank!"
+                break;
+
+            case "emptyPropertStatus":
+                draft.propertStatusErrors.hasErrors = true;
+                draft.propertStatusErrors.errorMessage = "This field must not be blank!"
+                break;
+
+            case "emptyPrice":
+                draft.priceErrors.hasErrors = true;
+                draft.priceErrors.errorMessage = "This field must not be blank!"
+                break;
+
+            case "emptyArea":
+                draft.areaErrors.hasErrors = true;
+                draft.areaErrors.errorMessage = "This field must not be blank!"
+                break;
+
+            case "emptyBorough":
+                draft.boroughErrors.hasErrors = true;
+                draft.boroughErrors.errorMessage = "This field must not be blank!"
                 break;
         }
     }
@@ -958,7 +1088,37 @@ function AddProperty() {
     function formSubmit(e) {
         e.preventDefault();
         console.log("the form has been submitted");
-        dispatch({ type: "changeSendRequest" });
+        if (
+            !state.titleErrors.hasErrors &&
+            !state.listingTypeErrors.hasErrors &&
+            !state.propertyStatusErrors.hasErrors &&
+            !state.priceErrors.hasErrors &&
+            !state.areaErrors.hasErrors &&
+            !state.boroughErrors.hasErrors &&
+            state.latitudeValue &&
+            state.longitudeValue
+        ) {
+            dispatch({ type: "changeSendRequest" });
+            dispatch({ type: "disabledTheBtn" });
+        } else if (state.titleValue === "") {
+            dispatch({ type: "emptyTitle" });
+            window.scrollTo(0,0);
+        } else if (state.listingTypeValue === "") {
+            dispatch({ type: "emptyListingType" });
+            window.scrollTo(0,0);
+        } else if (state.propertyStatusValue === "") {
+            dispatch({ type: "emptyPropertyStatus" });
+            window.scrollTo(0,0);
+        } else if (state.priceValue === "") {
+            dispatch({ type: "emptyPrice" });
+            window.scrollTo(0,0);
+        } else if (state.areaValue === "") {
+            dispatch({ type: "emptyArea" });
+            window.scrollTo(0,0);
+        } else if (state.boroughValue === "") {
+            dispatch({ type: "emptyBorough" });
+            window.scrollTo(0,0);
+        }
     }
 
     useEffect(() => {
@@ -993,9 +1153,10 @@ function AddProperty() {
                         formData
                     );
                     console.log(response.data);
-                    navigate("/listings");
+                    dispatch({ type: "openTheSnack" });
                 } catch (e) {
                     console.log(e.response);
+                    dispatch({ type: "enabledTheBtn" });
                 }
             }
             AddSingleProperty();
@@ -1035,6 +1196,7 @@ function AddProperty() {
                     fullWidth
                     type="submit"
                     className={classes.registerBtn}
+                    disabled={state.disabledBtn}
                 >
                     SUBMIT
                 </Button>
@@ -1050,25 +1212,34 @@ function AddProperty() {
                 <Button
                     variant="outlined"
                     fullWidth
-                    onClick={()=> navigate('/profile')}
+                    onClick={() => navigate("/profile")}
                     className={classes.registerBtn}
                 >
                     COMPLETE YOUR PROFILE TO ADD A PROPERTY
                 </Button>
             );
-        } else if (!GlobalState.userIsLogged){
-            return(
+        } else if (!GlobalState.userIsLogged) {
+            return (
                 <Button
-                        variant="outlined"
-                        fullWidth
-                        onClick={()=> navigate('/login')}
-                        className={classes.registerBtn}
-                    >
-                        SIGN IN TO ADD A PROPERTY
-                    </Button>
-            )
+                    variant="outlined"
+                    fullWidth
+                    onClick={() => navigate("/login")}
+                    className={classes.registerBtn}
+                >
+                    SIGN IN TO ADD A PROPERTY
+                </Button>
+            );
         }
     }
+
+    // SnackBar timeout then allowing the redirect
+    useEffect(() => {
+        if (state.openSnack) {
+            setTimeout(() => {
+                navigate("/listings");
+            }, 1500);
+        }
+    }, [state.openSnack]);
 
     return (
         <div className={classes.formContainer}>
@@ -1076,6 +1247,7 @@ function AddProperty() {
                 <Grid item container justifyContent="center">
                     <Typography variant="h4">SUBMIT A PROPERTY</Typography>
                 </Grid>
+
                 <Grid item container style={{ marginTop: "1rem" }}>
                     <TextField
                         id="title"
@@ -1089,6 +1261,14 @@ function AddProperty() {
                                 titleChosen: e.target.value,
                             })
                         }
+                        onBlur={(e) =>
+                            dispatch({
+                                type: "catchTitleErrors",
+                                titleChosen: e.target.value,
+                            })
+                        }
+                        error={state.titleErrors.hasErrors ? true : false}
+                        helperText={state.titleErrors.errorMessage}
                     />
                 </Grid>
                 {/* Listing Type and Property status fields */}
@@ -1106,6 +1286,16 @@ function AddProperty() {
                                     listingTypeChosen: e.target.value,
                                 })
                             }
+                            onBlur={(e) =>
+                                dispatch({
+                                    type: "catchListingTypeErrors",
+                                    listingTypeChosen: e.target.value,
+                                })
+                            }
+                            error={
+                                state.listingTypeErrors.hasErrors ? true : false
+                            }
+                            helperText={state.listingTypeErrors.errorMessage}
                             select
                             SelectProps={{
                                 native: true,
@@ -1132,6 +1322,18 @@ function AddProperty() {
                                     propertyStatusChosen: e.target.value,
                                 })
                             }
+                            onBlur={(e) =>
+                                dispatch({
+                                    type: "catchPropertyStatusErrors",
+                                    propertyStatusChosen: e.target.value,
+                                })
+                            }
+                            error={
+                                state.propertyStatusErrors.hasErrors
+                                    ? true
+                                    : false
+                            }
+                            helperText={state.propertyStatusErrors.errorMessage}
                             select
                             SelectProps={{
                                 native: true,
@@ -1192,6 +1394,14 @@ function AddProperty() {
                                     priceChosen: e.target.value,
                                 })
                             }
+                            onBlur={(e) =>
+                                dispatch({
+                                    type: "catchPriceErrors",
+                                    priceChosen: e.target.value,
+                                })
+                            }
+                            error={state.priceErrors.hasErrors ? true : false}
+                            helperText={state.priceErrors.errorMessage}
                         />
                     </Grid>
                 </Grid>
@@ -1336,6 +1546,14 @@ function AddProperty() {
                                     areaChosen: e.target.value,
                                 })
                             }
+                            onBlur={(e) =>
+                                dispatch({
+                                    type: "catchAreaErrors",
+                                    areaChosen: e.target.value,
+                                })
+                            }
+                            error={state.areaErrors.hasErrors ? true : false}
+                            helperText={state.areaErrors.errorMessage}
                             select
                             SelectProps={{
                                 native: true,
@@ -1362,6 +1580,14 @@ function AddProperty() {
                                     boroughChosen: e.target.value,
                                 })
                             }
+                            onBlur={(e) =>
+                                dispatch({
+                                    type: "catchBoroughErrors",
+                                    boroughChosen: e.target.value,
+                                })
+                            }
+                            error={state.boroughErrors.hasErrors ? true : false}
+                            helperText={state.boroughErrors.errorMessage}
                             select
                             SelectProps={{
                                 native: true,
@@ -1392,6 +1618,21 @@ function AddProperty() {
                     </Grid>
                 </Grid>
                 {/* Map Display for add property page */}
+
+                <Grid item style={{ marginTop: "1rem" }}>
+                    {state.latitudeValue && state.longitudeValue ? (
+                        <Alert severity="success">
+                            Your property is located @ {state.latitudeValue},{" "}
+                            {state.longitudeValue}
+                        </Alert>
+                    ) : (
+                        <Alert severity="warning">
+                            Locate your property on the map before submitting
+                            this form
+                        </Alert>
+                    )}
+                </Grid>
+
                 <Grid
                     item
                     container
@@ -1493,6 +1734,14 @@ function AddProperty() {
                     {SubmitButtonDisplay()}
                 </Grid>
             </form>
+            <Snackbar
+                open={state.openSnack}
+                message="You have successfully added your Property!"
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center",
+                }}
+            />
         </div>
     );
 }

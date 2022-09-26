@@ -12,7 +12,7 @@ import {
     FormControlLabel,
     Typography,
     Button,
-    Checkbox,
+    Snackbar,
     MenuItem,
     CardMedia,
     CardContent,
@@ -62,6 +62,8 @@ function ProfileUpdate(props) {
         uploadedPicture: [],
         profilePictureValue: props.userProfile.profilePic,
         sendRequest: 0,
+        openSnack: false,
+        disabledBtn: false,
     };
 
     function ReducerFunction(draft, action) {
@@ -87,6 +89,18 @@ function ProfileUpdate(props) {
                 break;
             case "changeSendRequest":
                 draft.sendRequest = draft.sendRequest + 1;
+                break;
+
+            case "openTheSnack":
+                draft.openSnack = true;
+                break;
+
+            case "disabledTheBtn":
+                draft.disabledBtn = true;
+                break;
+
+            case "enabledTheBtn":
+                draft.disabledBtn = false;
                 break;
         }
     }
@@ -136,18 +150,29 @@ function ProfileUpdate(props) {
                         formData
                     );
                     console.log(response.data);
-                    navigate(0);
+                    dispatch({ type: "openTheSnack" });
                 } catch (e) {
                     console.log(e.response);
+                    dispatch({ type: "enabledTheBtn" });
                 }
             }
             UpdateProfile();
         }
     }, [state.sendRequest]);
 
+    // SnackBar timeout then allowing the redirect
+    useEffect(() => {
+        if (state.openSnack) {
+            setTimeout(() => {
+                navigate(0);
+            }, 1500);
+        }
+    }, [state.openSnack]);
+
     function FormSubmit(e) {
         e.preventDefault();
         dispatch({ type: "changeSendRequest" });
+        dispatch({ type: "disabledTheBtn" });
     }
 
     function ProfilePictureDisplay() {
@@ -179,6 +204,7 @@ function ProfileUpdate(props) {
             );
         }
     }
+
     return (
         <>
             {/* Profile Form */}
@@ -288,11 +314,20 @@ function ProfileUpdate(props) {
                             fullWidth
                             type="submit"
                             className={classes.updateBtn}
+                            disabled={state.disabledBtn}
                         >
                             UPDATE
                         </Button>
                     </Grid>
                 </form>
+                <Snackbar
+                    open={state.openSnack}
+                    message="You have successfully updated your Profile!"
+                    anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "center",
+                    }}
+                />
             </div>
         </>
     );

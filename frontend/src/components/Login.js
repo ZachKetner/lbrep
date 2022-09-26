@@ -6,10 +6,10 @@ import axios from "axios";
 // MUI imports
 import {
     Grid,
-    AppBar,
+    Snackbar,
     Typography,
     Button,
-    Card,
+    Alert,
     CardHeader,
     CardMedia,
     CardContent,
@@ -53,21 +53,42 @@ function Login() {
         passwordValue: "",
         sendRequest: 0,
         token: "",
+        openSnack: false,
+        disabledBtn: false,
+        serverError: false,
     };
 
     function ReducerFunction(draft, action) {
         switch (action.type) {
             case "catchUsernameChange":
                 draft.usernameValue = action.usernameChosen;
+                draft.serverError = false;
                 break;
             case "catchPasswordChange":
                 draft.passwordValue = action.passwordChosen;
+                draft.serverError = false;
                 break;
             case "changeSendRequest":
                 draft.sendRequest = draft.sendRequest + 1;
                 break;
             case "catchToken":
                 draft.token = action.tokenValue;
+                break;
+
+            case "openTheSnack":
+                draft.openSnack = true;
+                break;
+
+            case "disabledTheBtn":
+                draft.disabledBtn = true;
+                break;
+
+            case "enabledTheBtn":
+                draft.disabledBtn = false;
+                break;
+
+            case "carchServerError":
+                draft.serverError = true;
                 break;
         }
     }
@@ -78,6 +99,7 @@ function Login() {
         e.preventDefault();
         console.log("the form has been submitted");
         dispatch({ type: "changeSendRequest" });
+        dispatch({ type: "disabledTheBtn" });
     }
 
     // Sign In request
@@ -108,6 +130,8 @@ function Login() {
                     // navigate("/");
                 } catch (error) {
                     console.log(error.response);
+                    dispatch({ type: "enabledTheBtn" });
+                    dispatch({ type: "carchServerError" });
                 }
             }
             SignIn();
@@ -141,7 +165,7 @@ function Login() {
                         emailInfo: response.data.email,
                         IdInfo: response.data.id,
                     });
-                    navigate("/");
+                    dispatch({ type: "openTheSnack" });
                 } catch (error) {
                     console.log(error.response);
                 }
@@ -153,12 +177,30 @@ function Login() {
         }
     }, [state.token]);
 
+    // SnackBar timeout then allowing the redirect
+    useEffect(() => {
+        if (state.openSnack) {
+            setTimeout(() => {
+                navigate("/");
+            }, 1500);
+        }
+    }, [state.openSnack]);
+
     return (
         <div className={classes.formContainer}>
             <form onSubmit={FormSubmit}>
                 <Grid item container justifyContent="center">
                     <Typography variant="h4">SIGN IN</Typography>
                 </Grid>
+
+                {state.serverError ? (
+                    <Alert severity="error">
+                        Incorrect Username or Password!
+                    </Alert>
+                ) : (
+                    ""
+                )}
+
                 <Grid item container style={{ marginTop: "1rem" }}>
                     <TextField
                         id="username"
@@ -172,6 +214,7 @@ function Login() {
                                 usernameChosen: e.target.value,
                             })
                         }
+                        error={state.serverError ? true : false}
                     />
                 </Grid>
                 <Grid item container style={{ marginTop: "1rem" }}>
@@ -188,6 +231,7 @@ function Login() {
                                 passwordChosen: e.target.value,
                             })
                         }
+                        error={state.serverError ? true : false}
                     />
                 </Grid>
                 <Grid
@@ -205,6 +249,7 @@ function Login() {
                         fullWidth
                         type="submit"
                         className={classes.registerBtn}
+                        disabled={state.disabledBtn}
                     >
                         SIGN IN
                     </Button>
@@ -226,6 +271,14 @@ function Login() {
                     </span>
                 </Typography>
             </Grid>
+            <Snackbar
+                open={state.openSnack}
+                message="You have successfully logged in!"
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center",
+                }}
+            />
         </div>
     );
 }
