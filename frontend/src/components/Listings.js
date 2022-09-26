@@ -9,8 +9,6 @@ import {
     TileLayer,
     Marker,
     Popup,
-    Polyline,
-    Polygon,
     useMap,
 } from "react-leaflet";
 import { Icon } from "leaflet";
@@ -37,8 +35,6 @@ import houseIconPng from "./Assets/Mapicons/house.png";
 import apartmentIconPng from "./Assets/Mapicons/apartment.png";
 import officeIconPng from "./Assets/Mapicons/office.png";
 
-// Assets
-import polygonOne from "./Shape";
 
 const useStyles = makeStyles({
     cardStyles: {
@@ -102,9 +98,6 @@ function Listings() {
         dispatch({ type: "getMap", mapData: map });
         return null;
     }
-
-    const [lat, setLat] = useState(51.505);
-    const [long, setLong] = useState(-0.09);
 
     const [allListings, setAllListings] = useState([]);
     const [dataIsLoading, setDataIsLoading] = useState(true);

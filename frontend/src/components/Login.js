@@ -10,10 +10,6 @@ import {
     Typography,
     Button,
     Alert,
-    CardHeader,
-    CardMedia,
-    CardContent,
-    CircularProgress,
     TextField,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
@@ -46,7 +42,6 @@ function Login() {
     const classes = useStyles();
     const navigate = useNavigate();
     const GlobalDispatch = useContext(DispatchContext);
-    const GlobalState = useContext(StateContext);
 
     const initialState = {
         usernameValue: "",

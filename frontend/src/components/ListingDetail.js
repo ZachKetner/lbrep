@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useImmerReducer } from "use-immer";
@@ -16,7 +16,7 @@ import universityIconPng from "./Assets/Mapicons/university.png";
 import ListingUpdate from "./ListingUpdate";
 
 // React Leaflet
-import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { Icon } from "leaflet";
 
 // MUI imports
@@ -27,10 +27,7 @@ import {
     Button,
     Dialog,
     Snackbar,
-    CardMedia,
-    CardContent,
     CircularProgress,
-    TextField,
     Breadcrumbs,
     Link,
 } from "@mui/material";
@@ -540,7 +537,7 @@ function ListingDetail() {
                     </Grid>
                 </Grid>
                 {/* Update and delete buttons is user matches the listing user created */}
-                {GlobalState.userId == state.listingInfo.seller ? (
+                {GlobalState.userId === state.listingInfo.seller ? (
                     <Grid
                         item
                         container
@@ -626,6 +623,7 @@ function ListingDetail() {
                                 ) * R;
                             return dist.toFixed(2);
                         }
+                        
                         return (
                             <div
                                 key={poi.id}

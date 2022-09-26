@@ -11,7 +11,6 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import Listings from "./components/Listings";
 import Header from "./components/Header";
-import Testing from "./components/Testing";
 import Register from "./components/Register";
 import AddProperty from "./components/AddProperty";
 import Profile from "./components/Profile";
@@ -82,7 +81,6 @@ function App() {
                             <Route path="/agencies/:id" element={<AgencyDetail />} />
                             <Route path="/listings/:id" element={<ListingDetail />} />
                             <Route path="/listings" element={<Listings />} />
-                            <Route path="/testing" element={<Testing />} />
                         </Routes>
                     </BrowserRouter>
                 </StyledEngineProvider>

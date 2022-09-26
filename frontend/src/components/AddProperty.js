@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo, useContext } from "react";
+import React, { useEffect, useRef, useMemo, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useImmerReducer } from "use-immer";
@@ -11,16 +11,13 @@ import {
     Button,
     Checkbox,
     Snackbar,
-    CardMedia,
-    CardContent,
-    CircularProgress,
     TextField,
     Alert,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 
 // React Leaflet
-import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, useMap, Marker } from "react-leaflet";
 
 // Context
 import StateContext from "../contexts/StateContext";

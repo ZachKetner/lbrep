@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useImmerReducer } from "use-immer";
@@ -15,47 +15,12 @@ import ProfileUpdate from "./ProfileUpdate";
 // MUI imports
 import {
     Grid,
-    FormControlLabel,
     Typography,
     Button,
-    Checkbox,
-    MenuItem,
-    CardMedia,
-    CardContent,
     CircularProgress,
-    TextField,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
-
-const useStyles = makeStyles({
-    formContainer: {
-        width: "50%",
-        marginLeft: "auto",
-        marginRight: "auto",
-        marginTop: "3rem",
-        border: "5px solid black",
-        padding: "3rem",
-    },
-    updateBtn: {
-        backgroundColor: "green",
-        color: "white",
-        fontSize: "1.1rem",
-        marginLeft: "1rem",
-        "&:hover": {
-            backgroundColor: "blue",
-        },
-    },
-    pictureBtn: {
-        backgroundColor: "blue",
-        color: "white",
-        fontSize: "0.8rem",
-        border: "1px solid black",
-        marginLeft: "1rem",
-    },
-});
 
 function Profile() {
-    const classes = useStyles();
     const navigate = useNavigate();
     const GlobalState = useContext(StateContext);
 
@@ -182,6 +147,7 @@ function Profile() {
                                     ? state.userProfile.profilePic
                                     : defaultProfilePicture
                             }
+                            alt={state.userProfile.profilePic}
                         />
                     </Grid>
                     <Grid

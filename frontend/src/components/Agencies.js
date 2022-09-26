@@ -1,16 +1,11 @@
-import React, { useEffect, useState, useRef, useMemo, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useImmerReducer } from "use-immer";
 
-// Context
-import StateContext from "../contexts/StateContext";
 
 // Assets
 import defaultProfilePicture from "./Assets/defaultProfilePicture.jpg";
-
-// Components
-import ProfileUpdate from "./ProfileUpdate";
 
 // MUI imports
 import {
@@ -19,21 +14,15 @@ import {
     Typography,
     Button,
     CardActions,
-    MenuItem,
     CardMedia,
     CardContent,
     CircularProgress,
-    TextField,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
-
-const useStyles = makeStyles({});
 
 function Agencies() {
-    const classes = useStyles();
+    
     const navigate = useNavigate();
-    const GlobalState = useContext(StateContext);
-
+    
     const initialState = {
         dataIsLoading: true,
         agenciesList: [],
