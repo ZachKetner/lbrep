@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'djoser',
+    'storages',
 
     'listings.apps.ListingsConfig',
     'users.apps.UsersConfig',
