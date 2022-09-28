@@ -1,3 +1,6 @@
+from django.core.files import File
+import PIL
+from io import BytesIO
 from random import choices
 from tokenize import blank_re
 from django.contrib.gis.db import models
@@ -6,6 +9,16 @@ from django.contrib.gis.geos import Point
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
+
+def compress(picture):
+    if picture:
+        pic = PIL.Image.open(picture)
+        buf = BytesIO()
+        pic.save(buf, 'JPEG', quality=35)
+        new_pic = File(buf, name=picture.name)
+        return new_pic
+    else:
+        return None
 
 class Listing(models.Model):
     seller = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null = True)
@@ -52,6 +65,19 @@ class Listing(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        new_picture1 = compress(self.picture1)
+        self.picture1 = new_picture1
+        new_picture2 = compress(self.picture2)
+        self.picture2 = new_picture2
+        new_picture3 = compress(self.picture3)
+        self.picture3 = new_picture3
+        new_picture4 = compress(self.picture4)
+        self.picture4 = new_picture4
+        new_picture5 = compress(self.picture5)
+        self.picture5 = new_picture5
+        super().save(*args, **kwargs)
 
 
 class Poi(models.Model):
